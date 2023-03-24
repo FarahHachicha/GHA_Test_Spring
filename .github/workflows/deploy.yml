@@ -1,31 +1,51 @@
-name: Deploy to Minikube
-
+name: Build Docker Image
 on:
   push:
     branches:
       - main
-
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: docker build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: farahhachicha/gha_test_spring:latest
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: docker push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: farahhachicha/gha_test_spring:latest
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
-
-      - name: Set up Minikube
-        uses: engineerd/setup-minikube@v1
-
-      - name: Set up Docker
-        uses: docker/setup-docker@v2
-
-      - name: Build Docker image
-        run: docker build -t test-GHA .
-
-      - name: Load Docker image into Minikube
+      - name: Setup Minikube
+        uses: hashicorp/setup-minikube@v1
+      - name: Start Minikube
         run: |
-          eval $(minikube docker-env)
-          docker tag test-GHA:latest test-GHA:minikube
+          minikube start
+      - name: Set kubectl context
+        run: |
+          kubectl config use-context minikube
+      - name: Deploy to Kubernetes
+        run: |
           kubectl apply -f kubernetes.yaml
 
-      - name: Wait for deployment
-        run: kubectl rollout status deployment/my-app
