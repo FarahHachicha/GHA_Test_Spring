@@ -36,14 +36,21 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Setup Minikube
-        uses: hashicorp/setup-minikube@v1
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      - name: Install Minikube
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo install minikube-linux-amd64 /usr/local/bin/minikube
+          minikube version
       - name: Start Minikube
         run: |
-          minikube start
+          sudo minikube start --driver=docker
       - name: Set kubectl context
         run: |
-          kubectl config use-context minikube
+          minikube kubectl -- get po -A
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f kubernetes.yaml
