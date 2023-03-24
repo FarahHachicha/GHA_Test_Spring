@@ -31,7 +31,6 @@ jobs:
           push: true
           tags: farahhachicha/gha_test_spring:latest
   
-jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
