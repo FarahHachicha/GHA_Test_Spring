@@ -57,15 +57,13 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f kubernetes.yaml
+      - name : Get Information 
+        run: |
           kubectl get all 
       - name: Forward Port
         run: |
           kubectl port-forward svc/my-app-service 8080:80 &
           echo $! > .port-forward.pid
-      - name: Test Application
-        run: |
-           ./mvnw integration-test
-          # Run integration tests against your application
       - name: Stop Port Forwarding
         run: |
           kill $(cat .port-forward.pid)

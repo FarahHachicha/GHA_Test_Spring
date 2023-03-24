@@ -10,7 +10,7 @@ on:
 jobs:
   #Test's job
   tests:
-    name: Unit tests
+    name: Unit & Integration tests
     #Run on Ubuntu using the latest version
     runs-on: ubuntu-latest
     #Job's steps
@@ -33,6 +33,9 @@ jobs:
       #Run Tests
       - name: Run Tests
         run: mvn -B test
+      - name: Integration Test 
+        run: mvn integration-test
+          # Run integration tests against your application
 
 #Sonar's Job
   sonar:
@@ -72,6 +75,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           SONAR_TOKEN: ${{ secrets.SN_TOKEN }}
+      
   #Build's job
   build:
     #Depends on sonar's job
