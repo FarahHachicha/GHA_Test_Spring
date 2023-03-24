@@ -24,7 +24,7 @@ jobs:
       - name: Load Docker image into Minikube
         run: |
           eval $(minikube docker-env)
-          docker tag my-image:latest my-image:minikube
+          docker tag test-GHA:latest test-GHA:minikube
           kubectl apply -f kubernetes.yaml
 
       - name: Wait for deployment
